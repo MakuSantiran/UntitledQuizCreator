@@ -34,6 +34,9 @@ function handleInput(e) {
 
 
 const Quiz_Editor = ({ navigation, route }) => {
+
+    console.log("HEY LISTEN")
+
     var keyIt = 0
     var groupForUseState = []
     var groupHeader = []

@@ -14,6 +14,8 @@ import { createSaveFile } from './InitiateSave';
 
 import Constants from 'expo-constants';
 
+import { ChoicesColor, Choices } from './BearTest';
+
 const Stack = createNativeStackNavigator();
 
 function shuffle(array) {
@@ -48,10 +50,10 @@ var questionImageVar = "None"
 
 var varMistakes = 0
 
-var choice1Var = NaN
-var choice2Var = NaN
-var choice3Var = NaN
-var choice4Var = NaN
+var potentialChoice1Var = NaN
+var potentialChoice2Var = NaN
+var potentialChoice3Var = NaN
+var potentialChoice4Var = NaN
 
 var correctlyAnswered = false
 
@@ -85,10 +87,10 @@ function restartVariables(){
    questionGroupHeaderVar = ""
    questionImageVar = "None"
   
-   choice1Var = NaN
-   choice2Var = NaN
-   choice3Var = NaN
-   choice4Var = NaN
+   potentialChoice1Var = NaN
+   potentialChoice2Var = NaN
+   potentialChoice3Var = NaN
+   potentialChoice4Var = NaN
   
    correctlyAnswered = false  
    localHealth = 100
@@ -104,6 +106,7 @@ function restartVariables(){
 //createSaveFile("Quiz1.db","./database/quizTemplate.db") // <-- local quiz save file
 
 const Quiz_Player = ({ navigation, route }) => {
+
   if (firstRun){
     restartVariables()
     firstRun = false
@@ -117,10 +120,6 @@ const Quiz_Player = ({ navigation, route }) => {
 
   // choices
   const [atQuestion, setAtQuestion] = useState(0);
-  const [choice1, setChoice1] = useState("File havent");
-  const [choice2, setChoice2] = useState("Been loaded");
-  const [choice3, setChoice3] = useState("Please select");
-  const [choice4, setChoice4] = useState("A valid file");
   const [questionImage, setQuestionImage] = useState("None")
   const [displayImage, setDisplayImage] = useState("none")
 
@@ -141,13 +140,7 @@ const Quiz_Player = ({ navigation, route }) => {
   const [showModal, setShowModal] = useState(false)
   const [showModal_Completed, setShowModal_Completed] = useState(false)
 
-  // buttons
-  const [C1B_COLOR, setC1B_COLOR] = useState(C_EMPTYBARCOLOR);
-  const [C2B_COLOR, setC2B_COLOR] = useState(C_EMPTYBARCOLOR);
-  const [C3B_COLOR, setC3B_COLOR] = useState(C_EMPTYBARCOLOR);
-  const [C4B_COLOR, setC4B_COLOR] = useState(C_EMPTYBARCOLOR);
-
-  const [C1B_SHOW, setC1B_Show] = useState("flex");userIdenAns
+  const [C1B_SHOW, setC1B_Show] = useState("flex");
   const [C2B_SHOW, setC2B_Show] = useState("flex");
   const [C3B_SHOW, setC3B_Show] = useState("flex");
   const [C4B_SHOW, setC4B_Show] = useState("flex");
@@ -248,44 +241,6 @@ const Quiz_Player = ({ navigation, route }) => {
     console.log(">>>> "+sound)
   }
 
-
-  
-
-
-  // audio related variables    
-  /*
-  // play soundtrack
-  async function playSound(Name) {
-    console.log('Loading Sound');
-    const { NOSTALGIA } = await Audio.Sound.createAsync(require('./sfx/Nostalgia.mp3'));
-    const { WRONG } = await Audio.Sound.createAsync(require('./sfx/Wrong.wav'));
-    const { CORRECT } = await Audio.Sound.createAsync(require('./sfx/Correct.wav'));
-
-    if (Name == "BG"){
-      NOSTALGIA.playAsync();
-      console.log('Playing Sound');
-    } 
-    else if (Name == "WRONG"){
-      
-      WRONG.playAsync();
-      console.log('Playing Sound');
-    }
-    else if (Name == "CORRECT"){
-      
-      CORRECT.playAsync();
-      console.log('Playing Sound');
-    }
-    else if (Name == "RESTART"){
-      const { sound } = await Audio.Sound.createAsync(require('./sfx/Restart.wav'));
-      console.log("LOADED >>>>"+sound)
-      sound.playAsync();
-      setTimeout(function() {sound.unloadAsync();}, 500);
-
-      console.log('Playing Sound');
-    }  
-  }
-  /**/
-
   /**/ //this runs per frames
   // this runs per frames
   useEffect(() => {
@@ -323,8 +278,6 @@ const Quiz_Player = ({ navigation, route }) => {
           }
         }
 
-
-
         localHealth -= 0.03
         setHealthVal(localHealth)
 
@@ -333,9 +286,7 @@ const Quiz_Player = ({ navigation, route }) => {
 
 
         //console.log("currennt Health "+ Stringified)
-
         // this runs per framee
-        
       }
 
       if (gameOver == true){
@@ -358,13 +309,9 @@ const Quiz_Player = ({ navigation, route }) => {
       //console.log("Frames "+frames)
     }; 
   
-
-
     const interval = setInterval(updateFrames, 1);
     return () => clearInterval(interval);
   }, [frames]);
-
-
 
   /*These are for persistent variables*/
   useEffect(() => {
@@ -391,20 +338,6 @@ const Quiz_Player = ({ navigation, route }) => {
   }, [questionImageVar])
 
 
-  // choices Updates
-  useEffect(() => {
-    setChoice1(choice1Var)
-  }, [choice1]);
-  useEffect(() => {
-    setChoice2(choice2Var)
-  }, [choice2]);
-  useEffect(() => {
-    setChoice3(choice3Var)
-  }, [choice3]);
-  useEffect(() => {
-    setChoice4(choice4Var)
-  }, [choice4]);
-
 
   const SQL_LITE = async(Name, SQL_Command)=>{
     var SQLiteFile = SQLite.openDatabase(Name)
@@ -422,27 +355,11 @@ const Quiz_Player = ({ navigation, route }) => {
   }
   
   const createQuiz = () => {
-    
     if (bgPlaying == false){
       bgPlaying = true
       playSound("BG", NOSTALGIA_SFX)
     }
-    /*
-    saveFile.transaction((txn) => {
-      txn.executeSql('SELECT * FROM Quiz', [], (trans, results) => {
-        var quizName = results.rows._array[0]["QuizName"]
-        createSaveFile(quizName+".db","TEMPLATE")
-
-        //console.log(quizName)
-        //console.log("Details: " + JSON.stringify(results))
-      },
-          (error) => {
-          console.log("execute error: " + JSON.stringify(error))
-      });
-    });
-    */
   }
-  
 
   const getQuizDetails = (Name) => {
     var quizFile = SQLite.openDatabase(Name)
@@ -542,13 +459,13 @@ const Quiz_Player = ({ navigation, route }) => {
       if (button!="None"){
         // could make this as different function
         if (button == "1B"){
-          setC1B_COLOR(C_INCORRECTCOLOR)
+          ChoicesColor.C1B_COLOR = C_INCORRECTCOLOR;
         }else if (button == "2B"){
-          setC2B_COLOR(C_INCORRECTCOLOR)
+          ChoicesColor.C2B_COLOR = C_INCORRECTCOLOR;
         }else if (button == "3B"){
-          setC3B_COLOR(C_INCORRECTCOLOR)
+          ChoicesColor.C3B_COLOR = C_INCORRECTCOLOR;
         }else if (button == "4B"){
-          setC4B_COLOR(C_INCORRECTCOLOR)
+          ChoicesColor.C4B_COLOR = C_INCORRECTCOLOR;
         }
         setMistakes(mistakes + 1)
         console.log("ADSSFGFDSGDFSAGFSDXFDFGFHGEGDFGTDHFG "+mistakes)
@@ -605,10 +522,10 @@ const Quiz_Player = ({ navigation, route }) => {
         choices = shuffle(choices)
         //console.log(choices)
           
-        choice1Var = choices[0]
-        choice2Var = choices[1]
-        choice3Var = choices[2]
-        choice4Var = choices[3]
+        potentialChoice1Var = choices[0]
+        potentialChoice2Var = choices[1]
+        potentialChoice3Var = choices[2]
+        potentialChoice4Var = choices[3]
         
         // this gets the index of correct answer
         var CorrectAnsInd = choices.indexOf(CorrectAns);
@@ -616,10 +533,10 @@ const Quiz_Player = ({ navigation, route }) => {
         console.log("THE CORRECT INDEX IS "+ CorrectAnsInd)
 
         if (Answer!=CorrectAns){
-          setChoice1(choice1Var)
-          setChoice2(choice2Var)
-          setChoice3(choice3Var)
-          setChoice4(choice4Var)
+          Choices.choice1 = potentialChoice1Var
+          Choices.choice2 = potentialChoice2Var
+          Choices.choice3 = potentialChoice3Var
+          Choices.choice4 = potentialChoice4Var
         }
         
         questionVar = quizDataTemp[atQuestionVar]["Question"]
@@ -639,16 +556,20 @@ const Quiz_Player = ({ navigation, route }) => {
           playSound("CORRECT", CORRECT_SFX)
           correctlyAnswered = true
 
+          // TESTING
+          //useBearStore.Bears += 1
+          //console.log("BEARS: "+useBearStore.Bears)
+
           if (button!="None"){
             // could make this as different function
             if (button == "1B"){
-              setC1B_COLOR(C_CORRECTANSWERCOLOR)
+              ChoicesColor.C1B_COLOR = C_CORRECTANSWERCOLOR;
             }else if (button == "2B"){
-              setC2B_COLOR(C_CORRECTANSWERCOLOR)
+              ChoicesColor.C2B_COLOR = C_CORRECTANSWERCOLOR;
             }else if (button == "3B"){
-              setC3B_COLOR(C_CORRECTANSWERCOLOR)
+              ChoicesColor.C3B_COLOR = C_CORRECTANSWERCOLOR;
             }else if (button == "4B"){
-              setC4B_COLOR(C_CORRECTANSWERCOLOR)
+              ChoicesColor.C4B_COLOR = C_CORRECTANSWERCOLOR;
             }
           }
 
@@ -657,10 +578,10 @@ const Quiz_Player = ({ navigation, route }) => {
             // delay
             if ((amountOfQuestion-1) > atQuestionVar){
               setTimeout(function() {
-                setC1B_COLOR(C_EMPTYBARCOLOR)
-                setC2B_COLOR(C_EMPTYBARCOLOR)
-                setC3B_COLOR(C_EMPTYBARCOLOR)
-                setC4B_COLOR(C_EMPTYBARCOLOR)
+                ChoicesColor.C1B_COLOR = C_EMPTYBARCOLOR;
+                ChoicesColor.C2B_COLOR = C_EMPTYBARCOLOR;
+                ChoicesColor.C3B_COLOR = C_EMPTYBARCOLOR;
+                ChoicesColor.C4B_COLOR = C_EMPTYBARCOLOR;
                 atQuestionVar = atQuestionVar + 1
                 correctlyAnswered = false
                 checkAnswer(Name, true)
@@ -762,7 +683,7 @@ const Quiz_Player = ({ navigation, route }) => {
     choice1: {
       margin: 10,
       width: '75%',
-      backgroundColor: C1B_COLOR,
+      backgroundColor: ChoicesColor.C1B_COLOR,
       textAlign: 'center',
       display: C1B_SHOW
     },
@@ -770,7 +691,7 @@ const Quiz_Player = ({ navigation, route }) => {
     choice2: {
       margin: 10,
       width: '75%',
-      backgroundColor: C2B_COLOR,
+      backgroundColor: ChoicesColor.C2B_COLOR,
       textAlign: 'center',
       display: C2B_SHOW
     },
@@ -778,7 +699,7 @@ const Quiz_Player = ({ navigation, route }) => {
     choice3: {
       margin: 10,
       width: '75%',
-      backgroundColor: C3B_COLOR,
+      backgroundColor: ChoicesColor.C3B_COLOR,
       textAlign: 'center',
       display: C3B_SHOW
     },
@@ -786,7 +707,7 @@ const Quiz_Player = ({ navigation, route }) => {
     choice4: {
       margin: 10,
       width: '75%',
-      backgroundColor: C4B_COLOR,
+      backgroundColor: ChoicesColor.C4B_COLOR,
       textAlign: 'center',
       display: C4B_SHOW
     },
@@ -1002,28 +923,25 @@ const Quiz_Player = ({ navigation, route }) => {
 
       <Text> {'\n'}</Text>
 
-      {
-        /*
-      <Pressable style={styles.choice1} title={choice1} onPress={() => {checkAnswer(quizFile, false, choice1, "1B");}}>
+      <Pressable style={styles.choice1} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice1, "1B");}}>
         <View style={styles.health1}></View>
-        <Text style={styles.textInChoice}>{choice1}</Text>
+        <Text style={styles.textInChoice}>{Choices.choice1}</Text>
       </Pressable>
-      <Pressable style={styles.choice2} title={choice1} onPress={() => {checkAnswer(quizFile, false, choice2, "2B");}}>
+      <Pressable style={styles.choice2} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice2, "2B");}}>
         <View style={styles.health2}></View>
-        <Text style={styles.textInChoice}>{choice2}</Text>
+        <Text style={styles.textInChoice}>{Choices.choice2}</Text>
       </Pressable>
-      <Pressable style={styles.choice3} title={choice1} onPress={() => {checkAnswer(quizFile, false, choice3, "3B");}}>
+      <Pressable style={styles.choice3} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice3, "3B");}}>
         <View style={styles.health3}></View>
-        <Text style={styles.textInChoice}>{choice3}</Text>
+        <Text style={styles.textInChoice}>{Choices.choice3}</Text>
       </Pressable>
-      <Pressable style={styles.choice4} title={choice1} onPress={() => {checkAnswer(quizFile, false, choice4, "4B");}}>
+      <Pressable style={styles.choice4} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice4, "4B");}}>
         <View style={styles.health4}></View>
-        <Text style={styles.textInChoice}>{choice4}</Text>
+        <Text style={styles.textInChoice}>{Choices.choice4}</Text>
       </Pressable>
-        */
-      }
 
-      {/* Identification Mode */}
+
+      {/* 
       <TextInput  
           style={styles.identificationTextInput}
           value={userIdenAns}
@@ -1035,7 +953,7 @@ const Quiz_Player = ({ navigation, route }) => {
         <View style={styles.health4}></View>
         <Text style={styles.textInChoice}>{"Submit"}</Text>
       </Pressable>
-      
+      Identification Mode */}
 
       {/* Completed Screen */}
       <View>
@@ -1070,10 +988,10 @@ const Quiz_Player = ({ navigation, route }) => {
                 restartVariables()
                 setShowModal_Completed(false)    
                 
-                setC1B_COLOR(C_EMPTYBARCOLOR)
-                setC2B_COLOR(C_EMPTYBARCOLOR)
-                setC3B_COLOR(C_EMPTYBARCOLOR)
-                setC4B_COLOR(C_EMPTYBARCOLOR)
+                ChoicesColor.C1B_COLOR = C_EMPTYBARCOLOR;
+                ChoicesColor.C2B_COLOR = C_EMPTYBARCOLOR;
+                ChoicesColor.C3B_COLOR = C_EMPTYBARCOLOR;
+                ChoicesColor.C4B_COLOR = C_EMPTYBARCOLOR;
 
                 getQuizDetails(loadedQuiz)
 
@@ -1087,10 +1005,10 @@ const Quiz_Player = ({ navigation, route }) => {
               restartVariables()
               setShowModal_Completed(false)    
               
-              setC1B_COLOR(C_EMPTYBARCOLOR)
-              setC2B_COLOR(C_EMPTYBARCOLOR)
-              setC3B_COLOR(C_EMPTYBARCOLOR)
-              setC4B_COLOR(C_EMPTYBARCOLOR)
+              ChoicesColor.C1B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C2B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C3B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C4B_COLOR = C_EMPTYBARCOLOR;
 
               const popAction = StackActions.pop(1);
               navigation.dispatch(popAction);
@@ -1132,10 +1050,10 @@ const Quiz_Player = ({ navigation, route }) => {
               setGOBODisplay("none")
               setShowModal(false)    
               
-              setC1B_COLOR(C_EMPTYBARCOLOR)
-              setC2B_COLOR(C_EMPTYBARCOLOR)
-              setC3B_COLOR(C_EMPTYBARCOLOR)
-              setC4B_COLOR(C_EMPTYBARCOLOR)
+              ChoicesColor.C1B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C2B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C3B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C4B_COLOR = C_EMPTYBARCOLOR;
 
               getQuizDetails(loadedQuiz)
             }}></Button>
@@ -1149,10 +1067,10 @@ const Quiz_Player = ({ navigation, route }) => {
               setGOBODisplay("none")
               setShowModal(false)    
               
-              setC1B_COLOR(C_EMPTYBARCOLOR)
-              setC2B_COLOR(C_EMPTYBARCOLOR)
-              setC3B_COLOR(C_EMPTYBARCOLOR)
-              setC4B_COLOR(C_EMPTYBARCOLOR)
+              ChoicesColor.C1B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C2B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C3B_COLOR = C_EMPTYBARCOLOR;
+              ChoicesColor.C4B_COLOR = C_EMPTYBARCOLOR;
 
               const popAction = StackActions.pop(1);
               navigation.dispatch(popAction);

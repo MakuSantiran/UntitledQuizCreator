@@ -21,13 +21,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 const Stack = createNativeStackNavigator();
 
 var NameQuiz = 'quizData.db'
-
+var firstLoad = true
 
 //https://stackoverflow.com/questions/1144783/how-do-i-replace-all-occurrences-of-a-string-in-javascript
 function replaceAll(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
-
 
 function loadQuizData(userFileName, QuizData){
     var userMadeQuizzes = SQLite.openDatabase(userFileName)
@@ -83,7 +82,6 @@ function closeDatabase(Name){
 }
 
 
-var firstLoad = true
 
 
 const Quiz_MainMenu = ({ navigation }) => {
@@ -176,8 +174,9 @@ const Quiz_MainMenu = ({ navigation }) => {
         //closeDatabase(NameQuiz)
         createSaveFile(NameQuiz,"SAVE")
         //console.log("Initiated")
-        
     }
+
+
 
     return (
     <View style={styles.container}>  
