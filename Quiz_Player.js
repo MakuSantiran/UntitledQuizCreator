@@ -14,7 +14,7 @@ import { createSaveFile } from './InitiateSave';
 
 import Constants from 'expo-constants';
 
-import { ChoicesColor, Choices } from './BearTest';
+import { ChoicesColor, Choices } from './Quiz_PlayerVariables';
 
 const Stack = createNativeStackNavigator();
 
