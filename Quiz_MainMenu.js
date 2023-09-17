@@ -16,7 +16,7 @@ import Dialog from "react-native-dialog";
 import Toast from 'react-native-root-toast';
 
 import { LinearGradient } from 'expo-linear-gradient';
-
+import { ChoicesColor, Choices } from './Quiz_PlayerFunctions';
 
 const Stack = createNativeStackNavigator();
 
@@ -199,7 +199,8 @@ const Quiz_MainMenu = ({ navigation }) => {
 > Being able to donwload other user made quiz online!\n
 > Compete with other players via highest score!\n   
 > More panic modes!\n     
-\n~Maku Santiran`)
+\n~Maku Santiran`);
+console.log(Choices.choice1);
         }}
         ></Button>
 

@@ -70,7 +70,9 @@ const App = () => {
 
 export default App
 
+
 // change IP Address: set REACT_NATIVE_PACKAGER_HOSTNAME=192.168.1.59
+// expo start
 // eas build -p android --profile preview
 // eas build -p android --profile production (only with major updates bruH)
 // https://stackoverflow.com/questions/72213464/how-to-navigate-with-react-native-expo
