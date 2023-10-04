@@ -50,7 +50,7 @@ var questionVar = ""
 var questionGroupHeaderVar = ""
 var questionImageVar = "None"
 
-var varMistakes = 0
+var identificationMistakes = 0
 
 var potentialChoice1Var = NaN
 var potentialChoice2Var = NaN
@@ -60,6 +60,7 @@ var potentialChoice4Var = NaN
 var correctlyAnswered = false
 
 var localHealth = 100
+var realHealth = 100
 var localGOBOAlpha = 0 //GameOver BlackOut - GOBO
 var gameOver = false
 
@@ -75,6 +76,7 @@ var C_HEALTHMID =  '#F9D949'
 // game related Mode
 var classicModeVar = true
 var remixValue = 0
+var remixValueRarity = 4 //the higher, the more rare
 
 function restartVariables(){
    count = 1
@@ -100,10 +102,19 @@ function restartVariables(){
    BGMUSC_stopped = false
    stopAllBGSound = false
 
+   remixValue = 0
+   ChoicesStyleVar.displayIdentification = "none"
+   ChoicesStyleVar.displayMultipleChoice = "flex"
 
    // STYLES reset
    ChoicesStyleVar.GOBOAlpha = 0
 }
+
+
+// lerping to make animation smooth :D
+function lerp(a,b,t){
+  return (1-t)*a + t*b 
+} 
 
 // creates the save file if there is no existing
 //createSaveFile("UQG_SaveFile.db","SAVE") // <-- local main save file
@@ -117,7 +128,6 @@ const Quiz_Player = ({ navigation, route }) => {
     console.log(firstRun)
   }
   
-
   // quiz related variables
   const saveFile = SQLite.openDatabase("UQG_SaveFile.db")
   const [loadedQuiz, setLoadedQuiz] = useState("")
@@ -179,7 +189,10 @@ const Quiz_Player = ({ navigation, route }) => {
 
   //const [stopAllBGSound, setStopAllBGSound] = useState(false)
 
-
+  // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS 
+  // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS
+  // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS
+  // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS // FUNCTIONS
   function playBGLoop(name, sound, setVolume = 1){
     console.log('Playing '+name);
 
@@ -285,6 +298,17 @@ const Quiz_Player = ({ navigation, route }) => {
   
           //setQuestion(question)
           //setAtQuestion(0)
+
+          remixValue = Math.floor(Math.random() * remixValueRarity);
+          console.log("Remix VALUE ISSS "+remixValue)
+          ChoicesStyleVar.displayIdentification = "none"
+          ChoicesStyleVar.displayMultipleChoice = "flex"
+  
+          if (remixValue == 1  && classicModeVar){
+            ChoicesStyleVar.displayIdentification = "flex"
+            ChoicesStyleVar.displayMultipleChoice = "none"
+          }
+        
           setQuestion()
           setQuestionGroupHeader()
           setQuestionImage(questionImageVar)
@@ -293,19 +317,31 @@ const Quiz_Player = ({ navigation, route }) => {
           setFrames(0)
           setMistakes(0)
           
+          
           //console.log("Image File is  "+questionImage+" and question is"+questionVar)
           
           //console.log("NOW THAT NUMBER IS "+atQuestion)
   
           playSound("Restart", RESTART_SFX, 0.3)
+          identificationMistakes = 0
 
           if (classicModeVar == true){
             //console.log("I AM PLAYINGGGGGGGGGGGGGGGGG", classicMode)
             let randomMusicIndex =  Math.floor(Math.random() * 6);
             playBGLoop("BG", BGMUSIC_ARRAY[randomMusicIndex], 0.2)
           }
+
+          remixValue = Math.floor(Math.random() * remixValueRarity);
+          console.log("Remix VALUE ISSS "+remixValue)
+          ChoicesStyleVar.displayIdentification = "none"
+          ChoicesStyleVar.displayMultipleChoice = "flex"
   
-          checkAnswer(Name, true)
+          if (remixValue == 1  && classicModeVar){
+            ChoicesStyleVar.displayIdentification = "flex"
+            ChoicesStyleVar.displayMultipleChoice = "none"
+          }          
+          generateNewQuestion(Name, true);
+          
         } else {
           console.log("AA")
           questionVar="Uhh there isn't any question with this particular quiz (⁠o__⁠ o⁠;⁠)⁠ゞ"
@@ -328,60 +364,10 @@ const Quiz_Player = ({ navigation, route }) => {
     });
   }  
 
-  const checkAnswer = async(Name, Init = false, Answer="No Answer", button="None") => {
-
+  const generateNewQuestion = async(Name, Init = false, Answer="No Answer", button="None") =>{
     var quizFile = SQLite.openDatabase(Name)
     var Group = quizDataTemp[atQuestionVar]["Group"]
     var CorrectAns = quizDataTemp[atQuestionVar]["Answer"]
-    
-    //console.log(atQuestionVar+" "+CorrectAns)
-    
-    remixValue = Math.floor(Math.random() * 10);
-
-    console.log("REMIX VALUE IS: "+remixValue)
-
-    // this prevents from picking another option after correctly answered
-    if (correctlyAnswered == true){
-      return
-    }
-
-    // if incorrect answer (this happens if its not initiated [could be reworked])
-    if (Answer != CorrectAns && Init == false){
-
-      // this prevents to press the button multiple times
-      if (button!="None"){
-        // could make this as different function
-        if (button == "1B" && ChoicesStyleVar.C1B_COLOR == C_INCORRECTCOLOR){
-          return
-        }else if (button == "2B" && ChoicesStyleVar.C2B_COLOR == C_INCORRECTCOLOR){
-          return
-        }else if (button == "3B" && ChoicesStyleVar.C3B_COLOR == C_INCORRECTCOLOR){
-          return
-        }else if (button == "4B" && ChoicesStyleVar.C4B_COLOR == C_INCORRECTCOLOR){
-          return
-        }
-      }   
-
-      if (button!="None"){
-        // could make this as different function
-        if (button == "1B"){
-          ChoicesStyleVar.C1B_COLOR = C_INCORRECTCOLOR;
-        }else if (button == "2B"){
-          ChoicesStyleVar.C2B_COLOR = C_INCORRECTCOLOR;
-        }else if (button == "3B"){
-          ChoicesStyleVar.C3B_COLOR = C_INCORRECTCOLOR;
-        }else if (button == "4B"){
-          ChoicesStyleVar.C4B_COLOR = C_INCORRECTCOLOR;
-        }
-        setMistakes(mistakes + 1)
-        console.log("ADSSFGFDSGDFSAGFSDXFDFGFHGEGDFGTDHFG "+mistakes)
-      }   
-
-      localHealth = localHealth - 20
-      playSound("WRONG", WRONG_SFX)
-      console.log("Incorrect!")
-      return
-    }
 
     // this uhhh, adds new question
     quizFile.transaction((txn) => {
@@ -437,64 +423,185 @@ const Quiz_Player = ({ navigation, route }) => {
 
         console.log("Array: "+atQuestionVar+": "+quizDataTemp[atQuestionVar]["Question"]+" "+quizDataTemp[atQuestionVar]["QuestionId"])
         
+        remixValue = Math.floor(Math.random() * remixValueRarity);
+
         setQuestionGroupHeader()
         setQuestion()
         setQuestionImage(questionImageVar)
+        setUserIdenAns("")
         
-        // if correct answer
-        if (Answer == CorrectAns){
-          console.log("YES")
-          localHealth = localHealth + 15
-          playSound("CORRECT", CORRECT_SFX)
-          correctlyAnswered = true
+        ChoicesStyleVar.displayIdentification = "none"
+        ChoicesStyleVar.displayMultipleChoice = "flex"
 
-          // TESTING
-          //useBearStore.Bears += 1
-          //console.log("BEARS: "+useBearStore.Bears)
-
-          if (button!="None"){
-            // could make this as different function
-            if (button == "1B"){
-              ChoicesStyleVar.C1B_COLOR = C_CORRECTANSWERCOLOR;
-            }else if (button == "2B"){
-              ChoicesStyleVar.C2B_COLOR = C_CORRECTANSWERCOLOR;
-            }else if (button == "3B"){
-              ChoicesStyleVar.C3B_COLOR = C_CORRECTANSWERCOLOR;
-            }else if (button == "4B"){
-              ChoicesStyleVar.C4B_COLOR = C_CORRECTANSWERCOLOR;
-            }
-          }
-
-          if (Init == false){
-            
-            // delay
-            if ((amountOfQuestion-1) > atQuestionVar){
-              setTimeout(function() {
-                ChoicesStyleVar.C1B_COLOR = C_EMPTYBARCOLOR;
-                ChoicesStyleVar.C2B_COLOR = C_EMPTYBARCOLOR;
-                ChoicesStyleVar.C3B_COLOR = C_EMPTYBARCOLOR;
-                ChoicesStyleVar.C4B_COLOR = C_EMPTYBARCOLOR;
-                atQuestionVar = atQuestionVar + 1
-                correctlyAnswered = false
-                checkAnswer(Name, true)
-                console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA")
-              }, 1000);
-            } else{
-              stopAllBGSound = true
-              BGMUSC_stopped = false
-              setTimeout(function() {
-                setDrainHealth(false)
-                setShowModal_Completed(true)
-                console.log("Finished!")
-              }, 1000);
-            }
-          }
+        if (remixValue == 1  && classicModeVar){
+          ChoicesStyleVar.displayIdentification = "flex"
+          ChoicesStyleVar.displayMultipleChoice = "none"
         }
 
       },(error) => {
           console.log("execute error: " + JSON.stringify(error))
       });
     });
+    
+  }
+
+
+  const checkAnswer = async(Name, Init = false, Answer="No Answer", button="None") => {
+
+    var CorrectAns = quizDataTemp[atQuestionVar]["Answer"]
+    
+    //console.log(atQuestionVar+" "+CorrectAns)
+
+    // should make seperate function about thiss
+    if (remixValue == 1 && classicModeVar){
+      
+      // if incorrect
+      if (userIdenAns != CorrectAns && Init == false){
+        if (!correctlyAnswered){
+          setMistakes(mistakes + 1)
+          localHealth = localHealth -10
+          playSound("WRONG", WRONG_SFX)
+  
+          identificationMistakes += 1;
+          console.log(identificationMistakes)
+  
+  
+          if (identificationMistakes > 2) {
+            setUserIdenAns(CorrectAns)
+          }
+        }
+      }
+
+      if (userIdenAns == CorrectAns && !correctlyAnswered){
+        identificationMistakes = 0
+        setUserIdenAns("Correct!")
+
+        localHealth = localHealth + 15
+        playSound("CORRECT", CORRECT_SFX)
+        correctlyAnswered = true
+        ChoicesStyleVar.C4B_COLOR = C_CORRECTANSWERCOLOR;
+
+        if (Init == false){          
+          // delay
+          if ((amountOfQuestion-1) > atQuestionVar){
+            setTimeout(function() {
+              setUserIdenAns("")
+              ChoicesStyleVar.C4B_COLOR = C_EMPTYBARCOLOR;
+              atQuestionVar = atQuestionVar + 1
+              correctlyAnswered = false
+              generateNewQuestion(Name, Init, Answer, button);
+            }, 1000);
+  
+          } else{
+            stopAllBGSound = true
+            BGMUSC_stopped = false
+            setTimeout(function() {
+              setDrainHealth(false)
+              setShowModal_Completed(true)
+              console.log("Finished!")
+            }, 1000);
+          }
+        }
+
+        
+      }
+      return
+    }
+
+    // this prevents from picking another option after correctly answered
+    if (correctlyAnswered == true){
+      return
+    }
+
+    // if incorrect answer (this happens if its not initiated [could be reworked])
+    if (Answer != CorrectAns && Init == false){
+
+      // this prevents to press the button multiple times
+      if (button!="None"){
+        // could make this as different function
+        if (button == "1B" && ChoicesStyleVar.C1B_COLOR == C_INCORRECTCOLOR){
+          return
+        }else if (button == "2B" && ChoicesStyleVar.C2B_COLOR == C_INCORRECTCOLOR){
+          return
+        }else if (button == "3B" && ChoicesStyleVar.C3B_COLOR == C_INCORRECTCOLOR){
+          return
+        }else if (button == "4B" && ChoicesStyleVar.C4B_COLOR == C_INCORRECTCOLOR){
+          return
+        }
+      }   
+
+      if (button!="None"){
+        // could make this as different function
+        if (button == "1B"){
+          ChoicesStyleVar.C1B_COLOR = C_INCORRECTCOLOR;
+        }else if (button == "2B"){
+          ChoicesStyleVar.C2B_COLOR = C_INCORRECTCOLOR;
+        }else if (button == "3B"){
+          ChoicesStyleVar.C3B_COLOR = C_INCORRECTCOLOR;
+        }else if (button == "4B"){
+          ChoicesStyleVar.C4B_COLOR = C_INCORRECTCOLOR;
+        }
+        setMistakes(mistakes + 1)
+        console.log("ADSSFGFDSGDFSAGFSDXFDFGFHGEGDFGTDHFG "+mistakes)
+      }   
+
+      localHealth = localHealth - 20
+      playSound("WRONG", WRONG_SFX)
+      console.log("Incorrect!")
+      return
+    }
+
+
+    // if correct answer
+    if (Answer == CorrectAns){
+      console.log("YES")
+      localHealth = localHealth + 15
+      playSound("CORRECT", CORRECT_SFX)
+      correctlyAnswered = true
+
+      if (button!="None"){
+        // could make this as different function
+        if (button == "1B"){
+          ChoicesStyleVar.C1B_COLOR = C_CORRECTANSWERCOLOR;
+        }else if (button == "2B"){
+          ChoicesStyleVar.C2B_COLOR = C_CORRECTANSWERCOLOR;
+        }else if (button == "3B"){
+          ChoicesStyleVar.C3B_COLOR = C_CORRECTANSWERCOLOR;
+        }else if (button == "4B"){
+          ChoicesStyleVar.C4B_COLOR = C_CORRECTANSWERCOLOR;
+        }
+      }
+
+      if (Init == false){          
+        // delay
+        if ((amountOfQuestion-1) > atQuestionVar){
+          setTimeout(function() {
+            ChoicesStyleVar.C1B_COLOR = C_EMPTYBARCOLOR;
+            ChoicesStyleVar.C2B_COLOR = C_EMPTYBARCOLOR;
+            ChoicesStyleVar.C3B_COLOR = C_EMPTYBARCOLOR;
+            ChoicesStyleVar.C4B_COLOR = C_EMPTYBARCOLOR;
+            atQuestionVar = atQuestionVar + 1
+            correctlyAnswered = false
+            generateNewQuestion(Name, Init, Answer, button);
+            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA")
+          }, 1000);
+
+        } else{
+          stopAllBGSound = true
+          BGMUSC_stopped = false
+          setTimeout(function() {
+            setDrainHealth(false)
+            setShowModal_Completed(true)
+            console.log("Finished!")
+          }, 1000);
+        }
+      }
+    }
+
+
+    // if correct answer in Identification
+
+
 
     /*
     var Group = quizData[atQuestion]["Group"]
@@ -569,6 +676,9 @@ const Quiz_Player = ({ navigation, route }) => {
 
       if (drainHealth == true){
         
+        //psuedoPrevHeight =  lerp(psuedoPrevHeight, psuedoHeight , 0.5)
+        realHealth = lerp(realHealth, localHealth, 0.8)
+
         // health things!
         if (localHealth > 100){
           localHealth = 100
@@ -599,8 +709,13 @@ const Quiz_Player = ({ navigation, route }) => {
           }
         }
 
+        if (realHealth > 100){
+          realHealth = 100
+        }
+
+
         localHealth -= 0.03
-        setHealthVal(localHealth)
+        setHealthVal(realHealth)
 
         var Stringified = healthVal.toString() + "%"
         ChoicesStyleVar.health = Stringified
@@ -744,37 +859,40 @@ const Quiz_Player = ({ navigation, route }) => {
 
       <Text> {'\n'}</Text>
 
-      <Pressable style={mainStyle.choice1} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice1, "1B");}}>
-        <View style={mainStyle.health1}></View>
-        <Text style={mainStyle.textInChoice}>{Choices.choice1}</Text>
-      </Pressable>
-      <Pressable style={mainStyle.choice2} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice2, "2B");}}>
-        <View style={mainStyle.health2}></View>
-        <Text style={mainStyle.textInChoice}>{Choices.choice2}</Text>
-      </Pressable>
-      <Pressable style={mainStyle.choice3} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice3, "3B");}}>
-        <View style={mainStyle.health3}></View>
-        <Text style={mainStyle.textInChoice}>{Choices.choice3}</Text>
-      </Pressable>
-      <Pressable style={mainStyle.choice4} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice4, "4B");}}>
-        <View style={mainStyle.health4}></View>
-        <Text style={mainStyle.textInChoice}>{Choices.choice4}</Text>
-      </Pressable>
+      {/* Multiple Choice Mode */}
+      <View style={mainStyle.multipleChoice}>
+        <Pressable style={mainStyle.choice1} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice1, "1B");}}>
+          <View style={mainStyle.health1}></View>
+          <Text style={mainStyle.textInChoice}>{Choices.choice1}</Text>
+        </Pressable>
+        <Pressable style={mainStyle.choice2} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice2, "2B");}}>
+          <View style={mainStyle.health2}></View>
+          <Text style={mainStyle.textInChoice}>{Choices.choice2}</Text>
+        </Pressable>
+        <Pressable style={mainStyle.choice3} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice3, "3B");}}>
+          <View style={mainStyle.health3}></View>
+          <Text style={mainStyle.textInChoice}>{Choices.choice3}</Text>
+        </Pressable>
+        <Pressable style={mainStyle.choice4} title={Choices.choice1} onPress={() => {checkAnswer(quizFile, false, Choices.choice4, "4B");}}>
+          <View style={mainStyle.health4}></View>
+          <Text style={mainStyle.textInChoice}>{Choices.choice4}</Text>
+        </Pressable>
+      </View>
 
+      {/* Identification Mode */}
+      <View style={mainStyle.identification}>
+        <TextInput  
+            style={mainStyle.identificationTextInput}
+            value={userIdenAns}
+            onChangeText={setUserIdenAns}      
+            placeholder="Type the correct answer"
+        ></TextInput>
 
-      {/* 
-      <TextInput  
-          style={styles.identificationTextInput}
-          value={userIdenAns}
-          onChangeText={setUserIdenAns}      
-          placeholder="Type the correct answer"
-      ></TextInput>
-
-      <Pressable style={styles.choice4} title={"Submit"} onPress={() => {checkAnswer(quizFile, false, choice4, "5B");}}>
-        <View style={styles.health4}></View>
-        <Text style={styles.textInChoice}>{"Submit"}</Text>
-      </Pressable>
-      Identification Mode */}
+        <Pressable style={mainStyle.choice4} title={"Submit"} onPress={() => {checkAnswer(quizFile, false, Choices.choice4, "5B");}}>
+          <View style={mainStyle.health4}></View>
+          <Text style={mainStyle.textInChoice}>{"Submit"}</Text>
+        </Pressable>          
+      </View>
 
       {/* Completed Screen */}
       <View>

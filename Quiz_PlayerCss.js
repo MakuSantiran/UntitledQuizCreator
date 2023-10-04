@@ -28,6 +28,8 @@ var ChoicesStyleVar = {
   redOpacity: 0,
 
   displayImage: "none",
+  displayMultipleChoice: "flex",
+  displayIdentification: "none",
 
   GOBOAlpha: 0,
   GOBODisplay: "none",
@@ -44,7 +46,6 @@ var mainStyle = StyleSheet.create({
   
     textInChoice: {
       color: 'white',
-
       textAlign: 'center',
       padding: 10,
     },
@@ -141,6 +142,30 @@ var mainStyle = StyleSheet.create({
     padding: "2%",
     textAlign: "center"
   },
+
+  identification: {
+    display: "none",
+    flex: 1,
+    backgroundColor: "#AAAAAA",
+    padding: 10,
+  },
+
+  multipleChoice: {
+    display: ChoicesStyleVar.displayMultipleChoice
+  },
+
+  jumbledMode:{
+    display: "none"
+  },
+
+  swappedMode:{
+    display: "none"
+  },
+
+  enumerateTheDefinition:{
+    display: "none"
+  }
+
 });
 
 var gameOverStyles = StyleSheet.create({
@@ -203,7 +228,6 @@ var ChoicesStyleUpdate = {
       
         textInChoice: {
           color: 'white',
-    
           textAlign: 'center',
           padding: 10,
         },
@@ -257,7 +281,7 @@ var ChoicesStyleUpdate = {
           opacity: 0.6,
           display: ChoicesStyleVar.healthDisplay
         },
-    
+
         health3: {
           position: "absolute", 
           backgroundColor: ChoicesStyleVar.C_healthBar, 
@@ -266,7 +290,7 @@ var ChoicesStyleUpdate = {
           opacity: 0.6,
           display: ChoicesStyleVar.healthDisplay
         },
-    
+
         health4: {
           position: "absolute", 
           backgroundColor: ChoicesStyleVar.C_healthBar, 
@@ -275,15 +299,15 @@ var ChoicesStyleUpdate = {
           opacity: 0.6,
           display: ChoicesStyleVar.healthDisplay
         },
-    
+
         warningL: {
           position: "absolute",
           height: "100%",
           width: "100%",
           opacity: ChoicesStyleVar.redOpacity,
-    
+
       },
-    
+
       imageStyle: {
         display: ChoicesStyleVar.displayImage,
         width: "70%", 
@@ -292,7 +316,7 @@ var ChoicesStyleUpdate = {
         borderColor: 'black',
         marginTop: "5%",
       },
-    
+
       identificationTextInput: {
         borderColor: '#000000',
         borderWidth: 1,
@@ -300,6 +324,33 @@ var ChoicesStyleUpdate = {
         padding: "2%",
         textAlign: "center"
       },
+
+      identification: {
+        display: ChoicesStyleVar.displayIdentification,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: "100%",
+      },
+
+      multipleChoice: {
+        display: ChoicesStyleVar.displayMultipleChoice,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: "100%",
+      },
+
+      jumbledMode:{
+        display: "none"
+      },
+
+      swappedMode:{
+        display: "none"
+      },
+
+      enumerateTheDefinition:{
+        display: "none"
+      }
+
     });
     
     gameOverStyles = StyleSheet.create({
