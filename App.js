@@ -76,3 +76,9 @@ export default App
 // eas build -p android --profile preview
 // eas build -p android --profile production (only with major updates bruH)
 // https://stackoverflow.com/questions/72213464/how-to-navigate-with-react-native-expo
+
+
+
+// git add .
+// git commit -m 'WhateverMessage'
+// git push

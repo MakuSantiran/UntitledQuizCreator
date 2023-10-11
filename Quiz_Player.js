@@ -453,10 +453,12 @@ const Quiz_Player = ({ navigation, route }) => {
     //console.log(atQuestionVar+" "+CorrectAns)
 
     // should make seperate function about thiss
+    // IDENTIFICATION MODE
     if (remixValue == 1 && classicModeVar){
-      
+      var theUserIdenAns = userIdenAns.toLowerCase()
+
       // if incorrect
-      if (userIdenAns != CorrectAns && Init == false){
+      if (theUserIdenAns.trim() != CorrectAns.toLowerCase() && Init == false){
         if (!correctlyAnswered){
           setMistakes(mistakes + 1)
           localHealth = localHealth -10
@@ -472,7 +474,7 @@ const Quiz_Player = ({ navigation, route }) => {
         }
       }
 
-      if (userIdenAns == CorrectAns && !correctlyAnswered){
+      if (theUserIdenAns.trim() == CorrectAns.toLowerCase() && !correctlyAnswered){
         identificationMistakes = 0
         setUserIdenAns("Correct!")
 
@@ -676,8 +678,7 @@ const Quiz_Player = ({ navigation, route }) => {
 
       if (drainHealth == true){
         
-        //psuedoPrevHeight =  lerp(psuedoPrevHeight, psuedoHeight , 0.5)
-        realHealth = lerp(realHealth, localHealth, 0.8)
+        realHealth = lerp(realHealth, localHealth, 0.6)
 
         // health things!
         if (localHealth > 100){
@@ -695,7 +696,7 @@ const Quiz_Player = ({ navigation, route }) => {
           setIsInLowHealth(true)
           ChoicesStyleVar.C_healthBar = GameColors.C_INCORRECTCOLOR
         }
-        if (localHealth < 0){
+        if (realHealth < 0){
           gameOver = true
         }
 
