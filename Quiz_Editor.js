@@ -32,19 +32,18 @@ function handleInput(e) {
 }
 
 
+var keyIt = 0
+var groupForUseState = []
+var groupHeader = []
+var groupList = []
+var currentQuiz = ""
+var positionIndVar = 0
+var fileAddress = ""
+
 
 const Quiz_Editor = ({ navigation, route }) => {
+    console.log("HEY LISTEN", groupHeader.length)
 
-    console.log("HEY LISTEN")
-
-    var keyIt = 0
-    var groupForUseState = []
-    var groupHeader = []
-    var groupList = []
-    var currentQuiz = ""
-    var positionIndVar = 0
-
-    const [fileAddress, setFileAddress] = useState("")
     const [groupDisplay, setGroupDisplay] = useState([])
     const [groupListSlct, setGroupListSlct] = useState([])
     const [groupChoice, setGroupChoice] = useState([])
@@ -94,6 +93,19 @@ const Quiz_Editor = ({ navigation, route }) => {
                 >
                     <Text style={styles.groupText} >{Group}</Text>
                 </Pressable>
+                <Text>
+                {"\n"}
+                <Button buttonStyle={styles.groupDisable} title="Enable" onPress={() => {
+                    enableDisableGroup(Group, 0)
+                    setShowGroupEdit(false)
+                }} />{"  "}
+                <Button buttonStyle={styles.groupDisable} title="Disable" onPress={() => {
+                    enableDisableGroup(Group, 1)
+                    setShowGroupEdit(false)
+                }} />  
+                </Text>
+
+
             </View>
         );
         
@@ -248,10 +260,14 @@ const Quiz_Editor = ({ navigation, route }) => {
         var userMadeQuiz = SQLite.openDatabase(userFileName)
         var GroupDictionary = {}
 
+        console.log("Getting groups! "+userFileName)
+
         // first get the list of groups
         userMadeQuiz.transaction((txn) => {
             txn.executeSql('SELECT DISTINCT "Group" FROM QuestionSet;', [], (trans, results) => {
                 
+                console.log("ABCDEFGHIJKLMNOP")
+
                 // initiate the group 
                 var i = 0
                 for (i=0; i<results.rows._array.length; i++){
@@ -338,6 +354,30 @@ const Quiz_Editor = ({ navigation, route }) => {
 // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) 
 // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) // CRUD OPERATIONS YAY (ARGH) 
 
+    function enableDisableGroup(Group, disableValue){
+
+        var userMadeQuiz = SQLite.openDatabase(fileAddress)
+        var sqlStatement = `UPDATE "QuestionSet" SET 'Disabled' = "${disableValue}" WHERE "Group" == '${Group}';`
+        
+        console.log(sqlStatement)
+
+        userMadeQuiz.transaction((txn) => {
+            txn.executeSql(sqlStatement, [], (trans, results) => {
+                console.log("SUCCESSSSSSSSSSSSSSSSS!")
+            }, (error) => {
+                console.log("Error! Cant Update.. looks like something's wronng with command")
+            })
+        })
+
+        groupHeader = []; 
+        setGroupDisplay([])
+        getGroups(fileAddress)
+        setShowModal(false);
+        setNewGroupName()
+        ToastAndroid.show('You have set disable value of "'+Group+'" to '+disableValue+'!', ToastAndroid.SHORT);
+    }
+
+
     function modifyGroupName(Group, NewGroupName){
         var userMadeQuiz = SQLite.openDatabase(fileAddress)
         var sqlStatement = `UPDATE "QuestionSet" SET 'Group' = "${NewGroupName}" WHERE "Group" == '${Group}';`
@@ -358,11 +398,9 @@ const Quiz_Editor = ({ navigation, route }) => {
             })
         })
 
-        groupHeader.pop(); 
+        groupHeader = []; 
         setGroupDisplay([])
         getGroups(fileAddress)
-        setShowModal(false);
-        setNewGroupName()
         ToastAndroid.show('You have modified "'+Group+'" group name!', ToastAndroid.SHORT);
     }
 
@@ -435,7 +473,7 @@ const Quiz_Editor = ({ navigation, route }) => {
          
         recentlyEditedID = ID
 
-        groupHeader.pop(); 
+        groupHeader = []; 
         setGroupDisplay([])
         getGroups(fileAddress)
         setShowModal(!showModal);
@@ -506,7 +544,8 @@ const Quiz_Editor = ({ navigation, route }) => {
         })
         /**/
 
-        groupHeader.pop(); 
+        groupHeader = []; 
+        groupList = [];
         setGroupDisplay([])
         getGroups(fileAddress)
         setShowModal(!showModal);
@@ -528,7 +567,7 @@ const Quiz_Editor = ({ navigation, route }) => {
             })
         })
 
-        groupHeader.pop(); 
+        groupHeader = []; 
         setGroupDisplay([])
         getGroups(fileAddress)
         setShowModal(!showModal);  
@@ -687,6 +726,10 @@ const Quiz_Editor = ({ navigation, route }) => {
 
         },
 
+        groupDisable: {
+            backgroundColor: '#ff0000'
+        },
+
         titleText: {
             color: '#fff',
             fontSize: 20,
@@ -807,17 +850,23 @@ const Quiz_Editor = ({ navigation, route }) => {
     // get the passed value first
     React.useEffect(() => {
         if (route.params?.quizFile) {
+
+            keyIt = 0
+            groupForUseState = []
+            groupHeader = []
+            groupList = []
+            currentQuiz = ""
+            positionIndVar = 0
+            fileAddress = route.params?.quizFile
+
             console.log("The darn file was "+route.params?.quizFile)
             console.log("---------------------Initiated-------------------")
-            setFileAddress(route.params?.quizFile)
 
             checkNUpdate(route.params?.quizFile, "Disabled", "INTEGER", 0)
             checkNUpdate(route.params?.quizFile, "RemixExclusion", "TEXT", '""')
 
-            getGroups(route.params?.quizFile)
-            setFileAddress(route.params?.quizFile)
             setQuizName(route.params?.quizName)
-
+            getGroups(route.params?.quizFile)
         }
     }, [route.params?.quizFile, route.params?.quizName]);
 
